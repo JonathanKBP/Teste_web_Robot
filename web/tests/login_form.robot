@@ -7,28 +7,38 @@ Test Teardown   Encerra Sessão
 *** Test Cases ***
 Login com sucesso
   Go To           ${url}/login
-  Input Text      css:input[name=username]  stark
-  Input Text      css:input[name=password]  jarvis!
-  Click Element   class:btn-login
+  Login With      stark  jarvis!
 
-  Page Should Contain   Olá, Tony Stark. Você acessou a área logada!
+  Should See Logged User   Tony Stark
 
 Senha invalida
   [tags]            login_error
   Go To             ${url}/login
-  Input Text        css:input[name=username]  stark
-  Input Text        css:input[name=password]  abc123
-  Click Element     class:btn-login
+  Login With        stark   abc123
 
-  ${message}=       Get WebElement    id:flash
-  Should Contain    ${message.text}   Senha é invalida!
+  Should Contain Login Alert   Senha é invalida!
 
 Senha invalida
   [tags]            login_user404
   Go To             ${url}/login
-  Input Text        css:input[name=username]  kevin
-  Input Text        css:input[name=password]  abc123
-  Click Element     class:btn-login
+  Login With        kevin   abc123
+
+  Should Contain Login Alert   O usuário informado não está cadastrado!
+
+***Keywords***
+Login With
+  [Arguments]     ${uname}   ${pass}
+  Input Text      css:input[name=username]  ${uname}
+  Input Text      css:input[name=password]  ${pass}
+  Click Element   class:btn-login
+
+Should Contain Login Alert
+  [Arguments]       ${expect_message}
 
   ${message}=       Get WebElement    id:flash
-  Should Contain    ${message.text}   O usuário informado não está cadastrado!
+  Should Contain    ${message.text}   ${expect_message}
+
+Should See Logged User
+  [Arguments]           ${full_name}
+
+  Page Should Contain   Olá, ${full_name}. Você acessou a área logada!
